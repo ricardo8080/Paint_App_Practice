@@ -115,9 +115,8 @@ namespace GrillaInfografía
             SolidBrush sb = new SolidBrush(Color.Transparent);
             rotateBox.Visible = false;
             rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
-            isLeftRotation = true;
-            this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation, (int)rotateGrades.Value,
-                getCenterPoint(), getSelMatrix(), matrixBorder, pointsToCreate, this.normalSizeMatrix);
+            this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation, 270 + (int)rotateGrades.Value,
+                getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
             Refresh();
             createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
             gr.Dispose();
@@ -128,10 +127,9 @@ namespace GrillaInfografía
             gr = gridPanel.CreateGraphics();
             SolidBrush sb = new SolidBrush(Color.Transparent);
             rotateBox.Visible = false;
-            isLeftRotation = false;
             rotateBox.Location = new Point(55, 630);
-            this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation, (int)rotateGrades.Value,
-                getCenterPoint(), getSelMatrix(), matrixBorder, pointsToCreate, this.normalSizeMatrix);
+            this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation, 90+ (int)rotateGrades.Value ,
+                getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
             Refresh();
             createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
             gr.Dispose();
@@ -423,14 +421,12 @@ namespace GrillaInfografía
                 countClick = (int)CurrentStateOfClick.SECONDCLICK;
                 pointsToCreate[0] = (int)point.X / xDimMatrix;
                 pointsToCreate[1] = (int)point.Y / yDimMatrix;
-                Console.WriteLine("1: " + pointsToCreate[0] + " " + pointsToCreate[1]);
             }
             else if (countClick == (int)CurrentStateOfClick.SECONDCLICK)
             {
                 countClick = (int)CurrentStateOfClick.THIRDCLICK;
                 pointsToCreate[2] = (int)point.X / xDimMatrix;
                 pointsToCreate[3] = (int)point.Y / yDimMatrix;
-                Console.WriteLine("2: " + pointsToCreate[2] + " " + pointsToCreate[3]);
                 matrixBorder[0] = pm.getMin(pointsToCreate[0], pointsToCreate[2]); //xstart  
                 matrixBorder[1] = pm.getMin(pointsToCreate[1], pointsToCreate[3]); //ystart  
                 matrixBorder[2] = pm.getMax(pointsToCreate[0], pointsToCreate[2]); //xend
@@ -514,5 +510,4 @@ namespace GrillaInfografía
         }
  
     }
-
 }

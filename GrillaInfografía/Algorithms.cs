@@ -240,12 +240,15 @@ namespace GrillaInfografía
             int y = ((int)yPoint) / ydimension;
             this.matrixPixelData = matrixPixelData;
             Color oldColor = this.matrixPixelData[x, y];
-            floodFill(xdimension, ydimension, x, y, fillColor, oldColor);
+            if (oldColor != fillColor) {
+                floodFill(xdimension, ydimension, x, y, fillColor, oldColor);
+            }
 
             return this.matrixPixelData;
         }
         private void floodFill(int xdimension, int ydimension, int x, int y, Color fillColor, Color oldColor) {
-            if (processMethods.iCanDraw(x, y, this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1)) && this.matrixPixelData[x, y] == oldColor)
+            if (processMethods.iCanDraw(x, y, this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1)) 
+                && this.matrixPixelData[x, y] == oldColor)
             {
                 this.matrixPixelData[x, y] = fillColor;
                 floodFill(xdimension, ydimension, x + 1, y, fillColor, oldColor);
@@ -254,29 +257,38 @@ namespace GrillaInfografía
                 floodFill(xdimension, ydimension, x, y - 1, fillColor, oldColor);
             }
         }
-
-        internal Color[,] calcNewPointsOfMat(bool isLeftRotation, int grades, int[] center, Color[,] tempMatrix, int [] matrixBorder, int[] pointsToCreate, Color[,] normalSizeMatrix)
+        internal Color[,] calcNewPointsOfMat(bool isLeftRotation, int grades, int[] center, Color[,] tempMatrix, int [] matrixBorder, Color[,] normalSizeMatrix)
         {
-            Console.WriteLine("c: " + center[0] + " " + center[1]);
             this.matrixPixelData = normalSizeMatrix;
-            int newX = 0;
-            int newY = 0;
+            double newX = 0;
+            double newY = 0;
+            cleanSectionOfMatrix(matrixBorder,tempMatrix);
             for (int i = matrixBorder[0]; i < matrixBorder[2]; i++)//i is X
             {
                 for (int j = matrixBorder[1]; j < matrixBorder[3]; j++)//j is Y
                 {   //center[0] is Xc and center[1] is Yc 
-                    newX = (int)(center[0] + (i - center[0]) * Math.Cos(grades) - (j - center[1]) * Math.Sin(grades));
-                    newY = (int)(center[1] + (i - center[0]) * Math.Sin(grades) + (j + center[1]) * Math.Cos(grades));
-                    if (processMethods.iCanDraw(newX, newY, this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1))
+                    newX = center[0] + (i - center[0]) * Math.Cos(grades) - (j - center[1]) * Math.Sin(grades);
+                    newY = center[1] + (i - center[0]) * Math.Sin(grades) + (j - center[1]) * Math.Cos(grades);
+                    if (processMethods.iCanDraw((int)Math.Ceiling(newX), (int)Math.Ceiling(newY), this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1))
                         && tempMatrix[i - matrixBorder[0], j - matrixBorder[1]] != Color.Transparent)
                     {
-                        this.matrixPixelData[i, j] = Color.Transparent;
-                        this.matrixPixelData[newX, newY] = tempMatrix[i - matrixBorder[0], j - matrixBorder[1]];
+                        //this.matrixPixelData[i, j] = Color.Transparent;
+                        this.matrixPixelData[(int)Math.Ceiling(newX), (int)Math.Ceiling(newY)] = tempMatrix[i - matrixBorder[0], j - matrixBorder[1]];
                     }
                 }
+                Console.WriteLine();
             }
-
             return this.matrixPixelData;
+        }
+        private void cleanSectionOfMatrix(int[] matrixBorder, Color[,] tempMatrix)
+        {
+            for (int i = matrixBorder[0]; i < matrixBorder[2]; i++)//i is X
+            {
+                for (int j = matrixBorder[1]; j < matrixBorder[3]; j++)//j is Y
+                {
+                    this.matrixPixelData[i, j] = Color.Transparent;
+                }
+            }
         }
     }
 }

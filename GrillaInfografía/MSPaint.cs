@@ -111,31 +111,12 @@ namespace GrillaInfografía
         }
         private void leftButton_Click(object sender, EventArgs e)
         {
-            gr = gridPanel.CreateGraphics();
-            SolidBrush sb = new SolidBrush(Color.Transparent);
-            rotateBox.Visible = false;
-            rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
-            this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation, 270 + (int)rotateGrades.Value,
-                getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
-            Refresh();
-            createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
-            gr.Dispose();
-            sb.Dispose();
+            rotateClick(true);
         }
         private void rightButton_Click(object sender, EventArgs e)
         {
-            gr = gridPanel.CreateGraphics();
-            SolidBrush sb = new SolidBrush(Color.Transparent);
-            rotateBox.Visible = false;
-            rotateBox.Location = new Point(55, 630);
-            this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation, 90+ (int)rotateGrades.Value ,
-                getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
-            Refresh();
-            createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
-            gr.Dispose();
-            sb.Dispose();
+            rotateClick(false);
         }
-
         private void gridPanel_MouseClick(object sender, MouseEventArgs e)
         {
             switch (chosenMove)
@@ -413,38 +394,11 @@ namespace GrillaInfografía
                 sb.Dispose();
             }
         }
-        private void rotation()
-        {
-            Point point = gridPanel.PointToClient(Cursor.Position);
-            if (countClick == (int)CurrentStateOfClick.FIRSTCLICK)
-            {
-                countClick = (int)CurrentStateOfClick.SECONDCLICK;
-                pointsToCreate[0] = (int)point.X / xDimMatrix;
-                pointsToCreate[1] = (int)point.Y / yDimMatrix;
-            }
-            else if (countClick == (int)CurrentStateOfClick.SECONDCLICK)
-            {
-                countClick = (int)CurrentStateOfClick.THIRDCLICK;
-                pointsToCreate[2] = (int)point.X / xDimMatrix;
-                pointsToCreate[3] = (int)point.Y / yDimMatrix;
-                matrixBorder[0] = pm.getMin(pointsToCreate[0], pointsToCreate[2]); //xstart  
-                matrixBorder[1] = pm.getMin(pointsToCreate[1], pointsToCreate[3]); //ystart  
-                matrixBorder[2] = pm.getMax(pointsToCreate[0], pointsToCreate[2]); //xend
-                matrixBorder[3] = pm.getMax(pointsToCreate[1], pointsToCreate[3]); //yend
-                rotateBox.Visible = true;
-                rotateBox.Location = new Point(point.X - 25, point.Y - 25); //25 is the initial position of the panel to paint, so -25
-            }
-            else if (countClick == (int)CurrentStateOfClick.THIRDCLICK)
-            {
-                rotateBox.Visible = false;
-                rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
-            }
-        }
         private void recreateSelectedSpaceOfMatrix(Graphics gr, SolidBrush sb, int xPoint, int yPoint, Color[,] temporalMatrix)
         {
             int xSize = 1 + Math.Abs(pointsToCreate[0] - pointsToCreate[2]);
             int ySize = 1 + Math.Abs(pointsToCreate[1] - pointsToCreate[3]);
-            for (int i = xPoint; i < xPoint + xSize; i++ ) 
+            for (int i = xPoint; i < xPoint + xSize; i++)
             {
                 for (int j = yPoint; j < yPoint + ySize; j++)
                 {
@@ -452,7 +406,7 @@ namespace GrillaInfografía
                     {
                         sb.Color = temporalMatrix[i - xPoint, j - yPoint];
                         algorithms.paintFrameWithCoordinate(gr, xDimMatrix, yDimMatrix, i, j, sb);
-                        setMatrixValue(i,j,sb.Color);
+                        setMatrixValue(i, j, sb.Color);
                     }
                 }
             }
@@ -465,16 +419,63 @@ namespace GrillaInfografía
             matrixBorder[1] = pm.getMin(pointsToCreate[1], pointsToCreate[3]); //ystart
             matrixBorder[2] = pm.getMax(pointsToCreate[0], pointsToCreate[2]); //xend
             matrixBorder[3] = pm.getMax(pointsToCreate[1], pointsToCreate[3]); //yend
-            Color[,] temporalMatrix = new Color [xSize, ySize];
-            for (int i = matrixBorder[0]; i <= matrixBorder[2]; i++) 
+            Color[,] temporalMatrix = new Color[xSize, ySize];
+            for (int i = matrixBorder[0]; i <= matrixBorder[2]; i++)
             {
                 for (int j = matrixBorder[1]; j <= matrixBorder[3]; j++)
                 {
-                    temporalMatrix[i-matrixBorder[0],j-matrixBorder[1]] = this.normalSizeMatrix[i, j];
+                    temporalMatrix[i - matrixBorder[0], j - matrixBorder[1]] = this.normalSizeMatrix[i, j];
                     this.normalSizeMatrix[i, j] = Color.Transparent;
                 }
             }
             return temporalMatrix;
+        }
+        private void rotation()
+        {
+            Point point = gridPanel.PointToClient(Cursor.Position);
+            if (countClick == (int)CurrentStateOfClick.FIRSTCLICK)
+            {
+                countClick = (int)CurrentStateOfClick.SECONDCLICK;
+                pointsToCreate[0] = (int)point.X / xDimMatrix;
+                pointsToCreate[1] = (int)point.Y / yDimMatrix;
+                rotateBox.Visible = false;
+                rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
+            }
+            else if (countClick == (int)CurrentStateOfClick.SECONDCLICK)
+            {
+                countClick = (int)CurrentStateOfClick.FIRSTCLICK;
+                pointsToCreate[2] = (int)point.X / xDimMatrix;
+                pointsToCreate[3] = (int)point.Y / yDimMatrix;
+                matrixBorder[0] = pm.getMin(pointsToCreate[0], pointsToCreate[2]); //xstart  
+                matrixBorder[1] = pm.getMin(pointsToCreate[1], pointsToCreate[3]); //ystart  
+                matrixBorder[2] = pm.getMax(pointsToCreate[0], pointsToCreate[2]); //xend
+                matrixBorder[3] = pm.getMax(pointsToCreate[1], pointsToCreate[3]); //yend
+                rotateBox.Visible = true;
+                rotateBox.Location = new Point(point.X - 25, point.Y - 25); //25 is the initial position of the panel to paint, so -25
+            }
+        }
+        private void rotateClick(bool isLeftClick)
+        {
+            rotateBox.Visible = false;
+            rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
+            gr = gridPanel.CreateGraphics();
+            SolidBrush sb = new SolidBrush(Color.Transparent);
+            if (isLeftClick)
+            {
+                this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation
+                    , 270 + (int)rotateGrades.Value //270 allow to have the right angle for left
+                    , getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
+            }
+            else
+            {
+                this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation
+                    , 90 + (int)rotateGrades.Value,//90 allow to have the right angle for left
+                    getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
+            }
+            Refresh();
+            createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
+            gr.Dispose();
+            sb.Dispose();
         }
         private void createPictureWithCurrentMatrix(Graphics gr, SolidBrush sb, int width, int height, string isVisible)
         {

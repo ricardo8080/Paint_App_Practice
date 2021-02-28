@@ -305,12 +305,6 @@ namespace GrillaInfografía
                     {
                         this.matrixPixelData[(int)Math.Ceiling(newX)/xDim, (int)Math.Ceiling(newY)/yDim] = tempMatrix[i - xs, j - ys];
                     }
-                    /*
-                    if (processMethods.iCanDraw((int)Math.Floor(newX), (int)Math.Floor(newY), this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1))
-                        && tempMatrix[i - xs, j - ys] != Color.Transparent)
-                    {
-                        this.matrixPixelData[(int)Math.Floor(newX), (int)Math.Floor(newY)] = tempMatrix[i - xs, j - ys];
-                    }*/
                 }
                 b++;
                 Console.WriteLine();

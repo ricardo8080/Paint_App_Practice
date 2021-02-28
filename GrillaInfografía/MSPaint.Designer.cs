@@ -52,10 +52,12 @@ namespace GrillaInfografía
             this.rotateGrades = new System.Windows.Forms.NumericUpDown();
             this.rightButton = new System.Windows.Forms.Button();
             this.leftButton = new System.Windows.Forms.Button();
+            this.scaleDrop = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.colorPicker)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dimensionGripFrame)).BeginInit();
             this.rotateBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.rotateGrades)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.scaleDrop)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -314,6 +316,34 @@ namespace GrillaInfografía
             this.leftButton.UseVisualStyleBackColor = true;
             this.leftButton.Click += new System.EventHandler(this.leftButton_Click);
             // 
+            // scaleDrop
+            // 
+            this.scaleDrop.DecimalPlaces = 1;
+            this.scaleDrop.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.scaleDrop.Location = new System.Drawing.Point(1165, 645);
+            this.scaleDrop.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.scaleDrop.Minimum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.scaleDrop.Name = "scaleDrop";
+            this.scaleDrop.Size = new System.Drawing.Size(39, 20);
+            this.scaleDrop.TabIndex = 22;
+            this.scaleDrop.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            65536});
+            // 
             // MSPaint
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -321,6 +351,7 @@ namespace GrillaInfografía
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.scaleDrop);
             this.Controls.Add(this.rotateBox);
             this.Controls.Add(this.scaleButton);
             this.Controls.Add(this.rotationButton);
@@ -347,6 +378,7 @@ namespace GrillaInfografía
             ((System.ComponentModel.ISupportInitialize)(this.dimensionGripFrame)).EndInit();
             this.rotateBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.rotateGrades)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.scaleDrop)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -376,6 +408,7 @@ namespace GrillaInfografía
         private System.Windows.Forms.NumericUpDown rotateGrades;
         private System.Windows.Forms.Button rightButton;
         private System.Windows.Forms.Button leftButton;
+        private System.Windows.Forms.NumericUpDown scaleDrop;
     }
 }
 

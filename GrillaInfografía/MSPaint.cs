@@ -18,18 +18,18 @@ namespace GrillaInfografía
         Graphics gr = null; //panel name
         ColorDialog varColorPicker = new ColorDialog(); //Color of Lines
         Color[,] normalSizeMatrix;
-        
-        bool isLeftRotation = false;   
+        Color[,] scaleSizeMatrix;
         int xDimMatrix = 0;
         int yDimMatrix = 0;
         int dimension = 10;                                    //Dimension of the grid boxes
-        int[] matrixBorder = new int[4];                     // For zoom and translation
-        double[] matrixBorderv2 = new double[4];                     // For zoom and translation
         int chosenMove = (int)SelectedAlg.CLICK;               // Which function is selected
         int countClick = (int) CurrentStateOfClick.FIRSTCLICK; //When DDA alg. used, checks if you clicked one or two times
         int[] pointsToCreate = new int[4];                   // points to create line x1, y1, x2, y2
-        double[] pointsToCreatev2 = new double[4];                   // points to create line x1, y1, x2, y2
         int xRadio, yRadio;                                    //radio for ellipse
+        int[] matrixBorder = new int[4];                     // For zoom and translation
+        double[] matrixBorderv2 = new double[4];                     // For zoom and translation
+        double[] pointsToCreatev2 = new double[4];                   // points to create line x1, y1, x2, y2
+
 
         public MSPaint()
         {
@@ -175,6 +175,7 @@ namespace GrillaInfografía
                     }
                     break;
                 case (int)SelectedAlg.SCALING:
+                    scaleMethod();
                     break;
             }
         }
@@ -566,6 +567,44 @@ namespace GrillaInfografía
                 }
             }
         }
+        private void scaleMethod()
+        {
+            int xSize = normalSizeMatrix.GetLength(0);
+            int ySize = normalSizeMatrix.GetLength(1);
+            decimal scaleSize = scaleDrop.Value; //sx, sy
+            int xScaledSize = (int) Math.Floor(normalSizeMatrix.GetLength(0) * scaleSize);
+            int yScaledSize = (int) Math.Floor(normalSizeMatrix.GetLength(1) * scaleSize);
+            int xNewDimMatrix = (int)Math.Ceiling(xDimMatrix*scaleSize);
+            int yNewDimMatrix = (int)Math.Ceiling(yDimMatrix*scaleSize);
+            Refresh();
+            pm.createLinesGrid(dimension, gr,xSize * xDimMatrix,ySize * yDimMatrix, gridVisibility.Text);
+
+            this.scaleSizeMatrix = new Color[xScaledSize, yScaledSize];
+            int iScale = 0;
+            int jScale = 0;
+            bool []cases = new bool[4];
+            for (int i = 0; i < xSize; i++)
+            {
+                for (int j = 0; j < ySize; j++)
+                {
+
+                    if (this.normalSizeMatrix[i, j] != Color.Transparent)
+                    {
+                        iScale = (int)Math.Floor(i * scaleSize);
+                        jScale = (int)Math.Floor(j * scaleSize);
+                        //cases[0] = (iScale*xNewDimMatrix > (i*xDimMatrix)) && jScale*yNewDimMatrix > (j*yDimMatrix) ;
+                        //cases[1] = (iScale*xNewDimMatrix > (i*xDimMatrix)) && jScale*yNewDimMatrix < (j*yDimMatrix) ;
+                        //cases[2] = (iScale*xNewDimMatrix < (i*xDimMatrix)) && jScale*yNewDimMatrix < (j*yDimMatrix) ;
+                        //cases[3] = (iScale*xNewDimMatrix < (i*xDimMatrix)) && jScale*yNewDimMatrix > (j*yDimMatrix) ;
+                        //if (pm.iCanDraw(iScale, jScale, scaleSizeMatrix.GetLength(0), scaleSizeMatrix.GetLength(1))) 
+                        {
+                            //this.scaleSizeMatrix[i, j] = this.normalSizeMatrix[i, j];
+                        }
+                    }
+                }
+            }
+        }
+
         private int[] getCenterPoint()
         {
             int []centCoor = new int[2];

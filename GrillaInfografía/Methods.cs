@@ -92,5 +92,13 @@ namespace GrillaInfografía
         {
             return a > b ? a : b;
         }
+        public double getMinv2(double a, double b)
+        {
+            return a < b ? a : b;
+        }
+        public double getMaxv2(double a, double b)
+        {
+            return a > b ? a : b;
+        }
     }
 }

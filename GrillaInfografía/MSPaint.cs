@@ -23,10 +23,12 @@ namespace GrillaInfografía
         int xDimMatrix = 0;
         int yDimMatrix = 0;
         int dimension = 10;                                    //Dimension of the grid boxes
-        int [] matrixBorder = new int [4];                     // For zoom and translation
+        int[] matrixBorder = new int[4];                     // For zoom and translation
+        double[] matrixBorderv2 = new double[4];                     // For zoom and translation
         int chosenMove = (int)SelectedAlg.CLICK;               // Which function is selected
         int countClick = (int) CurrentStateOfClick.FIRSTCLICK; //When DDA alg. used, checks if you clicked one or two times
-        int [] pointsToCreate = new int [4];                   // points to create line x1, y1, x2, y2
+        int[] pointsToCreate = new int[4];                   // points to create line x1, y1, x2, y2
+        double[] pointsToCreatev2 = new double[4];                   // points to create line x1, y1, x2, y2
         int xRadio, yRadio;                                    //radio for ellipse
 
         public MSPaint()
@@ -112,10 +114,12 @@ namespace GrillaInfografía
         private void leftButton_Click(object sender, EventArgs e)
         {
             rotateClick(true);
+            //rotateClickv2(true);
         }
         private void rightButton_Click(object sender, EventArgs e)
         {
             rotateClick(false);
+            //rotateClickv2(false);
         }
         private void gridPanel_MouseClick(object sender, MouseEventArgs e)
         {
@@ -162,6 +166,7 @@ namespace GrillaInfografía
                 case (int)SelectedAlg.ROTATION:
                     if (e.Button.Equals(MouseButtons.Left))
                     {
+                        //rotationv2();
                         rotation();
                     }
                     else
@@ -405,7 +410,7 @@ namespace GrillaInfografía
                     if (pm.iCanDraw(i, j, this.normalSizeMatrix.GetLength(0), this.normalSizeMatrix.GetLength(1)))
                     {
                         sb.Color = temporalMatrix[i - xPoint, j - yPoint];
-                        algorithms.paintFrameWithCoordinate(gr, xDimMatrix, yDimMatrix, i, j, sb);
+                        //algorithms.paintFrameWithCoordinate(gr, xDimMatrix, yDimMatrix, i, j, sb);
                         setMatrixValue(i, j, sb.Color);
                     }
                 }
@@ -462,20 +467,87 @@ namespace GrillaInfografía
             SolidBrush sb = new SolidBrush(Color.Transparent);
             if (isLeftClick)
             {
-                this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation
-                    , 270 + (int)rotateGrades.Value //270 allow to have the right angle for left
+                this.normalSizeMatrix = algorithms.calcNewPointsOfMat(270 + (int)rotateGrades.Value //270 allow to have the right angle for left
                     , getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
             }
             else
             {
-                this.normalSizeMatrix = algorithms.calcNewPointsOfMat(isLeftRotation
-                    , 90 + (int)rotateGrades.Value,//90 allow to have the right angle for left
+                this.normalSizeMatrix = algorithms.calcNewPointsOfMat(90 + (int)rotateGrades.Value,//90 allow to have the right angle for right
                     getCenterPoint(), getSelMatrix(), matrixBorder, this.normalSizeMatrix);
             }
             Refresh();
             createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
             gr.Dispose();
             sb.Dispose();
+        }
+        private void rotationv2()
+        {
+            Point point = gridPanel.PointToClient(Cursor.Position);
+            if (countClick == (int)CurrentStateOfClick.FIRSTCLICK)
+            {
+                countClick = (int)CurrentStateOfClick.SECONDCLICK;
+                pointsToCreatev2[0] = point.X;
+                pointsToCreatev2[1] = point.Y;
+                rotateBox.Visible = false;
+                rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
+            }
+            else if (countClick == (int)CurrentStateOfClick.SECONDCLICK)
+            {
+                countClick = (int)CurrentStateOfClick.FIRSTCLICK;
+                pointsToCreatev2[2] = point.X;
+                pointsToCreatev2[3] = point.Y;
+                matrixBorderv2[0] = pm.getMinv2(pointsToCreatev2[0], pointsToCreatev2[2]); //xstart  
+                matrixBorderv2[1] = pm.getMinv2(pointsToCreatev2[1], pointsToCreatev2[3]); //ystart  
+                matrixBorderv2[2] = pm.getMaxv2(pointsToCreatev2[0], pointsToCreatev2[2]); //xend
+                matrixBorderv2[3] = pm.getMaxv2(pointsToCreatev2[1], pointsToCreatev2[3]); //yend
+                rotateBox.Visible = true;
+                rotateBox.Location = new Point(point.X - 25, point.Y - 25); //25 is the initial position of the panel to paint, so -25
+            }
+        }
+        private void rotateClickv2(bool isLeftClick)
+        {
+            rotateBox.Visible = false;
+            rotateBox.Location = new Point(55, 630); // Hardcoded value to take out of the panel the rotateBox
+            gr = gridPanel.CreateGraphics();
+            SolidBrush sb = new SolidBrush(Color.Transparent);
+            if (isLeftClick)
+            {
+                this.normalSizeMatrix = algorithms.calcNewPointsOfMatv2( (int)rotateGrades.Value //270 allow to have the right angle for left
+                    , getCenterPointv2(), getSelMatrixv2(), matrixBorderv2, this.normalSizeMatrix, xDimMatrix, yDimMatrix);
+            }
+            else
+            {
+                this.normalSizeMatrix = algorithms.calcNewPointsOfMatv2( (int)rotateGrades.Value,//90 allow to have the right angle for right
+                    getCenterPointv2(), getSelMatrixv2(), matrixBorderv2, this.normalSizeMatrix, xDimMatrix, yDimMatrix);
+            }
+            Refresh();
+            createPictureWithCurrentMatrix(gr, sb, gridPanel.Width, gridPanel.Height, gridVisibility.Text);
+            gr.Dispose();
+            sb.Dispose();
+        }
+        private Color[,] getSelMatrixv2()
+        {
+
+            int xSize = 1 + Math.Abs((int)(pointsToCreatev2[0]/ xDimMatrix) - (int)(pointsToCreatev2[2] / xDimMatrix));
+            int ySize = 1 + Math.Abs((int)(pointsToCreatev2[1] / yDimMatrix) - (int)(pointsToCreatev2[3] / yDimMatrix)) ;
+            matrixBorderv2[0] = pm.getMinv2(pointsToCreatev2[0], pointsToCreatev2[2]); //xstart
+            matrixBorderv2[1] = pm.getMinv2(pointsToCreatev2[1], pointsToCreatev2[3]); //ystart
+            matrixBorderv2[2] = pm.getMaxv2(pointsToCreatev2[0], pointsToCreatev2[2]); //xend
+            matrixBorderv2[3] = pm.getMaxv2(pointsToCreatev2[1], pointsToCreatev2[3]); //yend
+            int xs = (int)matrixBorderv2[0] / xDimMatrix;
+            int ys = (int)matrixBorderv2[1] / yDimMatrix;
+            int xe = (int)matrixBorderv2[2] / xDimMatrix;
+            int ye = (int)matrixBorderv2[3] / yDimMatrix;
+            Color[,] temporalMatrix = new Color[xSize, ySize];
+            for (int i = xs; i <= xe; i++)
+            {
+                for (int j = ys; j <= ye; j++)
+                {
+                    temporalMatrix[i - xs, j - ys] = this.normalSizeMatrix[i, j];
+                    this.normalSizeMatrix[i, j] = Color.Transparent;
+                }
+            }
+            return temporalMatrix;
         }
         private void createPictureWithCurrentMatrix(Graphics gr, SolidBrush sb, int width, int height, string isVisible)
         {
@@ -497,8 +569,16 @@ namespace GrillaInfografía
         private int[] getCenterPoint()
         {
             int []centCoor = new int[2];
-            centCoor[0] = (int)(matrixBorder[0] + matrixBorder[2]) / 2;
-            centCoor[1] = (int)(matrixBorder[1] + matrixBorder[3]) / 2;
+            centCoor[0] = (matrixBorder[0] + matrixBorder[2]) / 2;
+            centCoor[1] = (matrixBorder[1] + matrixBorder[3]) / 2;
+            return centCoor;
+        }
+        private double[] getCenterPointv2()
+        {
+            double[] centCoor = new double[2]; 
+
+            centCoor[0] = (matrixBorderv2[0] + matrixBorderv2[2]) / 2;
+            centCoor[1] = (matrixBorderv2[1] + matrixBorderv2[3]) / 2;
             return centCoor;
         }
         private void setMatrix(Color[,] matrixPixelData)

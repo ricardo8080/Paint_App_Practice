@@ -257,12 +257,12 @@ namespace GrillaInfografía
                 floodFill(xdimension, ydimension, x, y - 1, fillColor, oldColor);
             }
         }
-        internal Color[,] calcNewPointsOfMat(bool isLeftRotation, int grades, int[] center, Color[,] tempMatrix, int [] matrixBorder, Color[,] normalSizeMatrix)
+        internal Color[,] calcNewPointsOfMat(int grades, int[] center, Color[,] tempMatrix, int[] matrixBorder, Color[,] normalSizeMatrix)
         {
             this.matrixPixelData = normalSizeMatrix;
             double newX = 0;
             double newY = 0;
-            cleanSectionOfMatrix(matrixBorder,tempMatrix);
+            cleanSectionOfMatrix(matrixBorder, tempMatrix);
             for (int i = matrixBorder[0]; i < matrixBorder[2]; i++)//i is X
             {
                 for (int j = matrixBorder[1]; j < matrixBorder[3]; j++)//j is Y
@@ -280,11 +280,63 @@ namespace GrillaInfografía
             }
             return this.matrixPixelData;
         }
-        private void cleanSectionOfMatrix(int[] matrixBorder, Color[,] tempMatrix)
+        internal Color[,] calcNewPointsOfMatv2(int grades, double[] center, Color[,] tempMatrix, double[] matrixBorder, Color[,] normalSizeMatrix, int xDim, int yDim)
         {
+            this.matrixPixelData = normalSizeMatrix;
+            double newX = 0;
+            double newY = 0;
+            int xs = (int)matrixBorder[0] / xDim;
+            int ys = (int)matrixBorder[1] / yDim;
+            int xe = (int)matrixBorder[2] / xDim;
+            int ye = (int)matrixBorder[3] / yDim;
+            int a = 0, b = 0;
+            cleanSectionOfMatrixv2(matrixBorder, tempMatrix,xDim,yDim);
+            for (int i = xs; i < xe; i++)//i is X
+            {
+                for (int j = ys; j < ye; j++)//j is Y
+                {   //center[0] is Xc and center[1] is Yc 
+                    newX = center[0] + ((matrixBorder[0] + a * xDim) - center[0]) * Math.Cos(grades) - ((matrixBorder[1] + b * yDim) - center[1]) * Math.Sin(grades);
+                    newY = center[1] + ((matrixBorder[0] + a * xDim) - center[0]) * Math.Sin(grades) + ((matrixBorder[1] + b * yDim) - center[1]) * Math.Cos(grades);
+                    a++;
+                    Console.WriteLine((matrixBorder[0] + a * xDim) + " " + (matrixBorder[1] + b * yDim));
+                    Console.WriteLine(newX + " " + newY);
+                    if (processMethods.iCanDraw((int)Math.Ceiling(newX), (int)Math.Ceiling(newY), this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1))
+                        && tempMatrix[i - xs, j - ys] != Color.Transparent)
+                    {
+                        this.matrixPixelData[(int)Math.Ceiling(newX)/xDim, (int)Math.Ceiling(newY)/yDim] = tempMatrix[i - xs, j - ys];
+                    }
+                    /*
+                    if (processMethods.iCanDraw((int)Math.Floor(newX), (int)Math.Floor(newY), this.matrixPixelData.GetLength(0), this.matrixPixelData.GetLength(1))
+                        && tempMatrix[i - xs, j - ys] != Color.Transparent)
+                    {
+                        this.matrixPixelData[(int)Math.Floor(newX), (int)Math.Floor(newY)] = tempMatrix[i - xs, j - ys];
+                    }*/
+                }
+                b++;
+                Console.WriteLine();
+            }
+            return this.matrixPixelData;
+        }
+
+        private void cleanSectionOfMatrix(int[] matrixBorder, Color[,] tempMatrix) {
             for (int i = matrixBorder[0]; i < matrixBorder[2]; i++)//i is X
             {
                 for (int j = matrixBorder[1]; j < matrixBorder[3]; j++)//j is Y
+                {
+                    this.matrixPixelData[i, j] = Color.Transparent;
+                }
+            }
+        }
+        private void cleanSectionOfMatrixv2(double[] matrixBorder, Color[,] tempMatrix, int xDim, int yDim)
+        {
+            int xs = (int)matrixBorder[0] / xDim;
+            int ys = (int)matrixBorder[1] / yDim;
+            int xe = (int)matrixBorder[2] / xDim;
+            int ye = (int)matrixBorder[3] / yDim;
+
+            for (int i = xs; i < xe; i++)
+            {
+                for (int j = ys; j < ye; j++)
                 {
                     this.matrixPixelData[i, j] = Color.Transparent;
                 }
